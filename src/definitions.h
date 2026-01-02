@@ -8,9 +8,12 @@ static constexpr auto STATUS_SERVER_NAME = "The Forgotten Server";
 static constexpr auto STATUS_SERVER_VERSION = "1.6 (TibiaDev 8.60 downgrade)";
 static constexpr auto STATUS_SERVER_DEVELOPERS = "Mark Samman and Felipe Muniz";
 
-static constexpr auto CLIENT_VERSION_MIN = 860;
-static constexpr auto CLIENT_VERSION_MAX = 860;
-static constexpr auto CLIENT_VERSION_STR = "8.60";
+// static constexpr auto CLIENT_VERSION_MIN = 860;
+// static constexpr auto CLIENT_VERSION_MAX = 860;
+// static constexpr auto CLIENT_VERSION_STR = "8.60";
+static constexpr auto CLIENT_VERSION_MIN = 760;
+static constexpr auto CLIENT_VERSION_MAX = 772;
+static constexpr auto CLIENT_VERSION_STR = "7.72";
 
 static constexpr auto AUTHENTICATOR_DIGITS = 6U;
 static constexpr auto AUTHENTICATOR_PERIOD = 30U;

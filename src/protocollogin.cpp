@@ -94,6 +94,7 @@ void ProtocolLogin::getCharacterList(const std::string& accountName, const std::
 // Character list request
 void ProtocolLogin::onRecvFirstMessage(NetworkMessage& msg)
 {
+	std::cout << "ProtocolLogin::onRecvFirstMessage()" << std::endl;
 	if (g_game.getGameState() == GAME_STATE_SHUTDOWN) {
 		disconnect();
 		return;
@@ -103,6 +104,7 @@ void ProtocolLogin::onRecvFirstMessage(NetworkMessage& msg)
 
 	uint16_t version = msg.get<uint16_t>();
 	if (version <= 822) {
+		std::cout << "CHECKSUM_DISABLED" << std::endl;
 		setChecksumMode(CHECKSUM_DISABLED);
 	}
 
@@ -162,7 +164,16 @@ void ProtocolLogin::onRecvFirstMessage(NetworkMessage& msg)
 		return;
 	}
 
-	auto accountName = msg.getString();
+	uint32_t accountNumber = msg.get<uint32_t>();
+	std::cout << "accountNumber: " << accountNumber << std::endl;
+	if (accountNumber == 0) {
+		disconnectClient("Invalid account number.");
+		return;
+	}
+
+	//auto accountName = msg.getString();
+	const std::string& accountName = std::to_string(accountNumber);
+	std::cout << "accountName: " << accountName << std::endl;
 	if (accountName.empty()) {
 		disconnectClient("Invalid account name.");
 		return;

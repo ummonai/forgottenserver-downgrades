@@ -28,6 +28,7 @@ enum RequestedInfo_t : uint16_t
 
 void ProtocolStatus::onRecvFirstMessage(NetworkMessage& msg)
 {
+	std::cout << "ProtocolStatus::onRecvFirstMessage" << std::endl;
 	const static auto acceptorAddress = boost::asio::ip::make_address(getString(ConfigManager::IP));
 
 	const auto& ip = getIP();
@@ -75,6 +76,7 @@ void ProtocolStatus::onRecvFirstMessage(NetworkMessage& msg)
 
 void ProtocolStatus::sendStatusString()
 {
+	std::cout << "ProtocolStatus::sendStatusString" << std::endl;
 	auto output = OutputMessagePool::getOutputMessage();
 
 	setRawMessages(true);
@@ -144,6 +146,7 @@ void ProtocolStatus::sendStatusString()
 
 void ProtocolStatus::sendInfo(uint16_t requestedInfo, const std::string& characterName)
 {
+	std::cout << "ProtocolStatus::sendInfo" << std::endl;
 	auto output = OutputMessagePool::getOutputMessage();
 
 	if (requestedInfo & REQUEST_BASIC_SERVER_INFO) {

@@ -61,6 +61,7 @@ constexpr int64_t getTimeout(std::size_t slot)
 
 std::size_t clientLogin(const Player& player)
 {
+	std::cout << "ProtocolGame::clientLogin" << std::endl;
 	if (player.hasFlag(PlayerFlag_CanAlwaysLogin) || player.getAccountType() >= ACCOUNT_TYPE_GAMEMASTER) {
 		return 0;
 	}
@@ -121,6 +122,7 @@ void ProtocolGame::release()
 
 void ProtocolGame::login(uint32_t characterId, uint32_t accountId, OperatingSystem_t operatingSystem)
 {
+	std::cout << "ProtocolGame::login" << std::endl;
 	// dispatcher thread
 	Player* foundPlayer = g_game.getPlayerByGUID(characterId);
 	if (!foundPlayer || getBoolean(ConfigManager::ALLOW_CLONES)) {
@@ -228,6 +230,7 @@ void ProtocolGame::login(uint32_t characterId, uint32_t accountId, OperatingSyst
 
 void ProtocolGame::connect(uint32_t playerId, OperatingSystem_t operatingSystem)
 {
+	std::cout << "ProtocolGame::connect" << std::endl;
 	eventConnect = 0;
 
 	Player* foundPlayer = g_game.getPlayerByID(playerId);
@@ -259,6 +262,7 @@ void ProtocolGame::connect(uint32_t playerId, OperatingSystem_t operatingSystem)
 
 void ProtocolGame::logout(bool displayEffect, bool forced)
 {
+	std::cout << "ProtocolGame::logout" << std::endl;
 	// dispatcher thread
 	if (!player) {
 		return;
@@ -298,6 +302,7 @@ void ProtocolGame::logout(bool displayEffect, bool forced)
 // Login to the game world request
 void ProtocolGame::onRecvFirstMessage(NetworkMessage& msg)
 {
+	std::cout << "ProtocolGame::onRecvFirstMessage" << std::endl;
 	// Server is shutting down
 	if (g_game.getGameState() == GAME_STATE_SHUTDOWN) {
 		disconnect();
@@ -310,9 +315,11 @@ void ProtocolGame::onRecvFirstMessage(NetworkMessage& msg)
 
 	// Disconnect if RSA decrypt fails
 	if (!Protocol::RSA_decrypt(msg)) {
+		std::cout << "ProtocolGame::RSA decrypt failed" << std::endl;
 		disconnect();
 		return;
 	}
+	std::cout << "ProtocolGame::onRecvFirstMessage post RSA" << std::endl;
 
 	// Get XTEA key
 	xtea::key key;
@@ -334,7 +341,10 @@ void ProtocolGame::onRecvFirstMessage(NetworkMessage& msg)
 
 	msg.skipBytes(1); // Gamemaster flag
 
-	auto accountName = msg.getString();
+	//auto accountName = msg.getString();
+	uint32_t accountNumber = msg.get<uint32_t>();
+	const std::string& accountName = std::to_string(accountNumber);
+
 	auto characterName = msg.getString();
 	auto password = msg.getString();
 
@@ -343,12 +353,14 @@ void ProtocolGame::onRecvFirstMessage(NetworkMessage& msg)
 		return;
 	}
 
+	/*
 	uint32_t timeStamp = msg.get<uint32_t>();
 	uint8_t randNumber = msg.getByte();
 	if (challengeTimestamp != timeStamp || challengeRandom != randNumber) {
 		disconnect();
 		return;
 	}
+	*/
 
 	if (version < CLIENT_VERSION_MIN || version > CLIENT_VERSION_MAX) {
 		disconnectClient(fmt::format("Only clients with protocol {:s} allowed!", CLIENT_VERSION_STR));
@@ -394,6 +406,8 @@ void ProtocolGame::onRecvFirstMessage(NetworkMessage& msg)
 
 void ProtocolGame::onConnect()
 {
+	/*
+	std::cout << "ProtocolGame::onConnect" << std::endl;
 	auto output = OutputMessagePool::getOutputMessage();
 	static std::random_device rd;
 	static std::ranlux24 generator(rd());
@@ -418,6 +432,7 @@ void ProtocolGame::onConnect()
 	output->add<uint32_t>(adlerChecksum(output->getOutputBuffer() + sizeof(uint32_t), 8));
 
 	send(output);
+	*/
 }
 
 void ProtocolGame::disconnectClient(const std::string& message) const
@@ -437,6 +452,7 @@ void ProtocolGame::writeToOutputBuffer(const NetworkMessage& msg)
 
 void ProtocolGame::parsePacket(NetworkMessage& msg)
 {
+	std::cout << "ProtocolGame::parsePacket" << std::endl;
 	if (!acceptPackets || g_game.getGameState() == GAME_STATE_SHUTDOWN || msg.isEmpty()) {
 		return;
 	}

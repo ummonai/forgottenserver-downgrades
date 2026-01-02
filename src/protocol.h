@@ -37,6 +37,7 @@ public:
 
 	void send(OutputMessage_ptr msg) const
 	{
+		std::cout << "send" << std::endl;
 		if (auto connection = getConnection()) {
 			connection->send(msg);
 		}

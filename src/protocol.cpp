@@ -25,15 +25,21 @@ void XTEA_encrypt(OutputMessage& msg, const xtea::round_keys& key)
 
 bool XTEA_decrypt(NetworkMessage& msg, const xtea::round_keys& key)
 {
-	if (((msg.getLength() - 6) & 7) != 0) {
+	if (((msg.getLength() - 2) % 8) != 0) {
+	//if (((msg.getLength() - 6) & 7) != 0) {
+	//if (((msg.getLength() - 2) & 7) != 0) {
 		return false;
 	}
 
 	uint8_t* buffer = msg.getRemainingBuffer();
-	xtea::decrypt(buffer, msg.getLength() - 6, key);
+	//xtea::decrypt(buffer, msg.getLength() - 6, key);
+	//xtea::decrypt(buffer, msg.getLength() - 2, key);
+	xtea::decrypt(buffer, msg.getLength() - 4, key);
 
 	uint16_t innerLength = msg.get<uint16_t>();
-	if (innerLength + 8 > msg.getLength()) {
+	//if (innerLength + 8 > msg.getLength()) {
+	//if (innerLength > msg.getLength() - 4) {
+	if (innerLength + 4 > msg.getLength()) {
 		return false;
 	}
 
@@ -45,6 +51,7 @@ bool XTEA_decrypt(NetworkMessage& msg, const xtea::round_keys& key)
 
 void Protocol::onSendMessage(const OutputMessage_ptr& msg)
 {
+	std::cout << "Protocol::onSendMessage" << std::endl;
 	if (!rawMessages) {
 		msg->writeMessageLength();
 
@@ -57,7 +64,9 @@ void Protocol::onSendMessage(const OutputMessage_ptr& msg)
 
 void Protocol::onRecvMessage(NetworkMessage& msg)
 {
+	std::cout << "Protocol::onRecvMessage" << std::endl;
 	if (encryptionEnabled && !XTEA_decrypt(msg, key)) {
+		std::cout << "Protocol::onRecvMessage decryption disabled or failed" << std::endl;
 		return;
 	}
 
@@ -79,10 +88,12 @@ OutputMessage_ptr Protocol::getOutputBuffer(int32_t size)
 bool Protocol::RSA_decrypt(NetworkMessage& msg)
 {
 	if (msg.getRemainingBufferLength() < RSA_BUFFER_LENGTH) {
+		std::cout << "Protocol::RSA_decrypt - not enough data in packet" << std::endl;
 		return false;
 	}
 
 	tfs::rsa::decrypt(msg.getRemainingBuffer(), RSA_BUFFER_LENGTH);
+	std::cout << "Protocol::RSA_decrypt - post decrypt, should be 0 terminated" << std::endl;
 	return msg.getByte() == 0;
 }
 

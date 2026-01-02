@@ -99,6 +99,7 @@ void Connection::accept(Protocol_ptr protocol)
 
 void Connection::accept()
 {
+	std::cout << "Connection::accept" << std::endl;
 	if (connectionState == CONNECTION_STATE_PENDING) {
 		connectionState = CONNECTION_STATE_REQUEST_CHARLIST;
 	}
@@ -134,13 +135,19 @@ void Connection::accept()
 
 void Connection::parseHeader(const boost::system::error_code& error)
 {
+	std::cout << "Connection::parseHeader" << std::endl;
 	std::lock_guard<std::recursive_mutex> lockClass(connectionLock);
 	readTimer.cancel();
 
 	if (error) {
+		std::cout << "Connection::parseHeader A" << std::endl;
+		std::cout << "Connection::parseHeader error.value(): " << error.value()  << std::endl;
+		std::cout << "Connection::parseHeader error.message(): " << error.message() <<  std::endl;
+
 		close(FORCE_CLOSE);
 		return;
 	} else if (connectionState == CONNECTION_STATE_DISCONNECTED) {
+		std::cout << "Connection::parseHeader B" << std::endl;
 		return;
 	}
 
@@ -152,12 +159,16 @@ void Connection::parseHeader(const boost::system::error_code& error)
 	}
 
 	if (!receivedLastChar && connectionState == CONNECTION_STATE_GAMEWORLD_AUTH) {
+		std::cout << "Connection::parseHeader C" << std::endl;
 		uint8_t* msgBuffer = msg.getBuffer();
 
 		if (!receivedName && msgBuffer[1] == 0x00) {
+			std::cout << "Connection::parseHeader D" << std::endl;
 			receivedLastChar = true;
 		} else {
+			std::cout << "Connection::parseHeader E" << std::endl;
 			if (!receivedName) {
+				std::cout << "Connection::parseHeader F" << std::endl;
 				receivedName = true;
 
 				accept();
@@ -165,6 +176,7 @@ void Connection::parseHeader(const boost::system::error_code& error)
 			}
 
 			if (msgBuffer[0] == 0x0A) {
+				std::cout << "Connection::parseHeader G" << std::endl;
 				receivedLastChar = true;
 			}
 
@@ -174,21 +186,25 @@ void Connection::parseHeader(const boost::system::error_code& error)
 	}
 
 	if (receivedLastChar && connectionState == CONNECTION_STATE_GAMEWORLD_AUTH) {
+		std::cout << "Connection::parseHeader H" << std::endl;
 		connectionState = CONNECTION_STATE_GAME;
 	}
 
 	if (timePassed > 2) {
+		std::cout << "Connection::parseHeader I" << std::endl;
 		timeConnected = time(nullptr);
 		packetsSent = 0;
 	}
 
 	uint16_t size = msg.getLengthHeader();
 	if (size == 0 || size >= NETWORKMESSAGE_MAXSIZE - 16) {
+		std::cout << "Connection::parseHeader J" << std::endl;
 		close(FORCE_CLOSE);
 		return;
 	}
 
 	try {
+		std::cout << "Connection::parseHeader K" << std::endl;
 		readTimer.expires_after(std::chrono::seconds(CONNECTION_READ_TIMEOUT));
 		readTimer.async_wait(
 		    [thisPtr = std::weak_ptr<Connection>(shared_from_this())](const boost::system::error_code& error) {
@@ -210,6 +226,7 @@ void Connection::parseHeader(const boost::system::error_code& error)
 
 void Connection::parsePacket(const boost::system::error_code& error)
 {
+	std::cout << "Connection::parsePacket" << std::endl;
 	std::lock_guard<std::recursive_mutex> lockClass(connectionLock);
 	readTimer.cancel();
 
@@ -221,17 +238,17 @@ void Connection::parsePacket(const boost::system::error_code& error)
 	}
 
 	// Read potential checksum bytes
-	msg.get<uint32_t>();
+	//msg.get<uint32_t>();
 
 	if (!receivedFirst) {
 		receivedFirst = true;
 
 		if (!protocol) {
 			// Skip deprecated checksum bytes (with clients that aren't using it in mind)
-			uint16_t len = msg.getLength();
-			if (len < 280 && len != 151) {
-				msg.skipBytes(-NetworkMessage::CHECKSUM_LENGTH);
-			}
+			// uint16_t len = msg.getLength();
+			// if (len < 280 && len != 151) {
+			// 	msg.skipBytes(-NetworkMessage::CHECKSUM_LENGTH);
+			// }
 
 			// Game protocol has already been created at this point
 			protocol = service_port->make_protocol(msg, shared_from_this());

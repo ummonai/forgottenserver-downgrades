@@ -23,11 +23,28 @@ public:
 
 	void addCryptoHeader(checksumMode_t mode, uint32_t& sequence)
 	{
-		if (mode == CHECKSUM_ADLER) {
-			add_header(adlerChecksum(&buffer[outputBufferStart], info.length));
-		} else if (mode == CHECKSUM_SEQUENCE) {
-			add_header(sequence++);
+		(void)sequence;
+		switch (mode)
+		{
+			case CHECKSUM_DISABLED:
+				std::cout << "CHECKSUM_DISABLED" << std::endl;
+				break;
+			case CHECKSUM_ADLER:
+				std::cout << "CHECKSUM_ADLER" << std::endl;
+				break;
+			case CHECKSUM_SEQUENCE:
+				std::cout << "CHECKSUM_SEQUENCE" << std::endl;
+				break;
+			default:
+				std::cout << "unknown mode" << std::endl;
+				break;
 		}
+
+		// if (mode == CHECKSUM_ADLER) {
+		// 	add_header(adlerChecksum(&buffer[outputBufferStart], info.length));
+		// } else if (mode == CHECKSUM_SEQUENCE) {
+		// 	add_header(sequence++);
+		// }
 
 		writeMessageLength();
 	}
