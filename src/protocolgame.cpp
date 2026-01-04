@@ -452,7 +452,15 @@ void ProtocolGame::writeToOutputBuffer(const NetworkMessage& msg)
 
 void ProtocolGame::parsePacket(NetworkMessage& msg)
 {
-	std::cout << "ProtocolGame::parsePacket" << std::endl;
+	// std::cout << "ProtocolGame::parsePacket" << std::endl;
+	// std::cout << "ProtocolGame::msg.getLength() " <<  msg.getLength() << std::endl;
+	std::cout << "ProtocolGame::parsePacket packet: ";
+	for(uint32_t i=0; i<msg.getLength(); ++i)
+	{
+		std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<uint32_t>(*(msg.getBuffer() + i)) << " ";
+	}
+	std::cout << std::dec << std::endl;
+
 	if (!acceptPackets || g_game.getGameState() == GAME_STATE_SHUTDOWN || msg.isEmpty()) {
 		return;
 	}

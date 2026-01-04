@@ -119,9 +119,10 @@ void Connection::accept()
 		    });
 
 		// Read size of the first packet
-		auto bufferLength = !receivedLastChar && receivedName && connectionState == CONNECTION_STATE_GAMEWORLD_AUTH
-		                        ? 1
-		                        : NetworkMessage::HEADER_LENGTH;
+		// auto bufferLength = !receivedLastChar && receivedName && connectionState == CONNECTION_STATE_GAMEWORLD_AUTH
+		//                         ? 1
+		//                         : NetworkMessage::HEADER_LENGTH;
+		auto bufferLength = NetworkMessage::HEADER_LENGTH;
 		boost::asio::async_read(
 		    socket, boost::asio::buffer(msg.getBuffer(), bufferLength),
 		    [thisPtr = shared_from_this()](const boost::system::error_code& error, auto /*bytes_transferred*/) {

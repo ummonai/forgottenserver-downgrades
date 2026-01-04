@@ -25,18 +25,22 @@ void XTEA_encrypt(OutputMessage& msg, const xtea::round_keys& key)
 
 bool XTEA_decrypt(NetworkMessage& msg, const xtea::round_keys& key)
 {
-	if (((msg.getLength() - 2) % 8) != 0) {
+	std::cout << "XTEA_decrypt" << std::endl;
+	std::cout << "msg.getLength(): " << msg.getLength() << std::endl;
+
+	if (((msg.getLength() - 2) & 7) != 0) {
 	//if (((msg.getLength() - 6) & 7) != 0) {
 	//if (((msg.getLength() - 2) & 7) != 0) {
 		return false;
 	}
 
 	uint8_t* buffer = msg.getRemainingBuffer();
-	//xtea::decrypt(buffer, msg.getLength() - 6, key);
+	xtea::decrypt(buffer, msg.getLength() - 2, key);
 	//xtea::decrypt(buffer, msg.getLength() - 2, key);
-	xtea::decrypt(buffer, msg.getLength() - 4, key);
+	//xtea::decrypt(buffer, msg.getLength() - 4, key);
 
 	uint16_t innerLength = msg.get<uint16_t>();
+	std::cout << "innerLength: " << innerLength << std::endl;
 	//if (innerLength + 8 > msg.getLength()) {
 	//if (innerLength > msg.getLength() - 4) {
 	if (innerLength + 4 > msg.getLength()) {
@@ -55,6 +59,15 @@ void Protocol::onSendMessage(const OutputMessage_ptr& msg)
 	if (!rawMessages) {
 		msg->writeMessageLength();
 
+		// print unencrypted
+		std::cout << "Protocol::onSendMessage packet: ";
+		for(uint32_t i=0; i<msg->getLength(); ++i)
+		{
+			std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<uint32_t>(*(msg->getBuffer() + i)) << " ";
+		}
+		std::cout << std::dec << std::endl;
+		// --
+
 		if (encryptionEnabled) {
 			XTEA_encrypt(*msg, key);
 			msg->addCryptoHeader(checksumMode, sequenceNumber);
@@ -69,6 +82,15 @@ void Protocol::onRecvMessage(NetworkMessage& msg)
 		std::cout << "Protocol::onRecvMessage decryption disabled or failed" << std::endl;
 		return;
 	}
+
+	// print decrypted
+	std::cout << "Protocol::onRecvMessage packet: ";
+	for(uint32_t i=0; i<msg.getLength(); ++i)
+	{
+		std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<uint32_t>(*(msg.getBuffer() + i)) << " ";
+	}
+	std::cout << std::dec << std::endl;
+	// --
 
 	parsePacket(msg);
 }

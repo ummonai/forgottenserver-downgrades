@@ -1153,6 +1153,7 @@ void Events::eventPlayerOnGainSkillTries(Player* player, skills_t skill, uint64_
 
 void Events::eventPlayerOnNetworkMessage(Player* player, uint8_t recvByte, NetworkMessage* msg)
 {
+	std::cout << "Events::eventPlayerOnNetworkMessage" << std::endl;
 	// Player:onNetworkMessage(recvByte, msg)
 	if (info.playerOnNetworkMessage == -1) {
 		return;
