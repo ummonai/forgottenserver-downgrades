@@ -38,6 +38,7 @@ Position NetworkMessage::getPosition()
 
 void NetworkMessage::addString(std::string_view value)
 {
+	std::cout << "addString: " << value << std::endl;
 	std::string latin1Str = boost::locale::conv::from_utf<char>(value.data(), value.data() + value.size(), "ISO-8859-1",
 	                                                            boost::locale::conv::skip);
 	size_t stringLen = latin1Str.size();
@@ -53,6 +54,7 @@ void NetworkMessage::addString(std::string_view value)
 
 void NetworkMessage::addDouble(double value, uint8_t precision /* = 2*/)
 {
+	std::cout << "addDouble: " << value << std::endl;
 	addByte(precision);
 	add<uint32_t>(static_cast<uint32_t>((value * std::pow(static_cast<float>(10), precision)) +
 	                                    std::numeric_limits<int32_t>::max()));
@@ -60,6 +62,7 @@ void NetworkMessage::addDouble(double value, uint8_t precision /* = 2*/)
 
 void NetworkMessage::addBytes(const char* bytes, size_t size)
 {
+	std::cout << "addBytes: X" << std::endl;
 	if (!canAdd(size) || size > 8192) {
 		return;
 	}
@@ -71,6 +74,7 @@ void NetworkMessage::addBytes(const char* bytes, size_t size)
 
 void NetworkMessage::addPaddingBytes(size_t n)
 {
+	std::cout << "addPaddingBytes: count " << static_cast<uint32_t>(n) << std::endl;
 	if (!canAdd(n)) {
 		return;
 	}
@@ -81,6 +85,7 @@ void NetworkMessage::addPaddingBytes(size_t n)
 
 void NetworkMessage::addPosition(const Position& pos)
 {
+	std::cout << "addPosition: " << std::hex << std::setw(4) << std::setfill('0') << static_cast<uint32_t>(pos.x) << " " << static_cast<uint32_t>(pos.y) << std::setw(2) << " " << static_cast<uint32_t>(pos.z) << std::dec << std::endl;
 	add<uint16_t>(pos.x);
 	add<uint16_t>(pos.y);
 	addByte(pos.z);
@@ -88,28 +93,39 @@ void NetworkMessage::addPosition(const Position& pos)
 
 void NetworkMessage::addItem(uint16_t id, uint8_t count)
 {
+	std::cout << "addItem: X" << std::endl;
 	const ItemType& it = Item::items[id];
 
 	add<uint16_t>(it.clientId);
 
 	if (it.stackable) {
 		addByte(count);
-	} else if (it.isSplash() || it.isFluidContainer()) {
+	}/* else if (it.isSplash() || it.isFluidContainer()) {
 		addByte(fluidMap[count & 7]);
-	} 
+	} */
 }
 
 void NetworkMessage::addItem(const Item* item)
 {
+	std::cout << "addItem: Y" << std::endl;
 	const ItemType& it = Item::items[item->getID()];
 
 	add<uint16_t>(it.clientId);
 
+	/*
 	if (it.stackable) {
 		addByte(std::min<uint16_t>(0xFF, item->getItemCount()));
 	} else if (it.isSplash() || it.isFluidContainer()) {
 		addByte(fluidMap[item->getFluidType() & 7]);
+	}*/
+	if (it.stackable) {
+		addByte(std::min<uint16_t>(0xFF, item->getItemCount()));
+	} else if (it.isSplash() || it.isFluidContainer()) {
+		addByte(item->getSubType());
 	}
 }
 
-void NetworkMessage::addItemId(uint16_t itemId) { add<uint16_t>(Item::items[itemId].clientId); }
+void NetworkMessage::addItemId(uint16_t itemId) { 
+	std::cout << "addItem: Z" << std::endl;
+	add<uint16_t>(Item::items[itemId].clientId); 
+}

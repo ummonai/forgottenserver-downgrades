@@ -35,7 +35,7 @@ bool XTEA_decrypt(NetworkMessage& msg, const xtea::round_keys& key)
 	}
 
 	uint8_t* buffer = msg.getRemainingBuffer();
-	xtea::decrypt(buffer, msg.getLength() - 2, key);
+	xtea::decrypt(buffer, msg.getLength() - 2, key); // raczej 2
 	//xtea::decrypt(buffer, msg.getLength() - 2, key);
 	//xtea::decrypt(buffer, msg.getLength() - 4, key);
 
@@ -61,7 +61,7 @@ void Protocol::onSendMessage(const OutputMessage_ptr& msg)
 
 		// print unencrypted
 		std::cout << "Protocol::onSendMessage packet: ";
-		for(uint32_t i=0; i<msg->getLength(); ++i)
+		for(uint32_t i=0; i<msg->getLength() + 8; ++i) // +INITIAL_BUFFER_POSITION
 		{
 			std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<uint32_t>(*(msg->getBuffer() + i)) << " ";
 		}
@@ -85,7 +85,7 @@ void Protocol::onRecvMessage(NetworkMessage& msg)
 
 	// print decrypted
 	std::cout << "Protocol::onRecvMessage packet: ";
-	for(uint32_t i=0; i<msg.getLength(); ++i)
+	for(uint32_t i=0; i<msg.getLength()+ 8; ++i) //+INITIAL_BUFFER_POSITION
 	{
 		std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<uint32_t>(*(msg.getBuffer() + i)) << " ";
 	}
@@ -115,8 +115,15 @@ bool Protocol::RSA_decrypt(NetworkMessage& msg)
 	}
 
 	tfs::rsa::decrypt(msg.getRemainingBuffer(), RSA_BUFFER_LENGTH);
-	std::cout << "Protocol::RSA_decrypt - post decrypt, should be 0 terminated" << std::endl;
-	return msg.getByte() == 0;
+
+	bool ret = (msg.getByte() == 0);
+	if(ret) {
+		std::cout << "Protocol::RSA_decrypt - message decrypted properly (0 terminated)" << std::endl;
+	} else {
+		std::cout << "Protocol::RSA_decrypt - failed to decrypted (NOT 0 terminated)" << std::endl;
+	}
+	
+	return ret;
 }
 
 Connection::Address Protocol::getIP() const

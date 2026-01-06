@@ -19,7 +19,10 @@ public:
 
 	uint8_t* getOutputBuffer() { return &buffer[outputBufferStart]; }
 
-	void writeMessageLength() { add_header(info.length); }
+	void writeMessageLength() { 
+		std::cout << "writeMessageLength: " << std::hex << std::setw(4) << std::setfill('0') << static_cast<uint32_t>(info.length) << std::dec << std::endl;
+		add_header(info.length); 
+	}
 
 	void addCryptoHeader(checksumMode_t mode, uint32_t& sequence)
 	{

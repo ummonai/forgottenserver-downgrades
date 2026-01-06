@@ -71,7 +71,7 @@ private:
 	xtea::round_keys key;
 	uint32_t sequenceNumber = 0;
 	bool encryptionEnabled = false;
-	checksumMode_t checksumMode = CHECKSUM_ADLER;
+	checksumMode_t checksumMode = CHECKSUM_DISABLED;
 	bool rawMessages = false;
 };
 

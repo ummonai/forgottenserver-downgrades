@@ -39,7 +39,10 @@ public:
 		MAX_PROTOCOL_BODY_LENGTH = MAX_BODY_LENGTH - 10
 	};
 
-	NetworkMessage() = default;
+	//NetworkMessage() = default;
+	NetworkMessage() {
+		std::cout << "- new NetworkMessage -" << std::endl;
+	}
 
 	void reset() { info = {}; }
 
@@ -79,6 +82,7 @@ public:
 	// simply write functions for outgoing message
 	void addByte(uint8_t value)
 	{
+		std::cout << "addByte: " << std::hex << std::setw(2) << std::setfill('0') << static_cast<uint32_t>(value) << std::dec << std::endl;
 		if (!canAdd(1)) {
 			return;
 		}
@@ -90,6 +94,7 @@ public:
 	template <typename T>
 	void add(T value)
 	{
+		std::cout << "add<" << typeid(T).name() << ">: " << std::hex << std::setw(2) << std::setfill('0') << static_cast<uint32_t>(value) << std::dec << std::endl;
 		if (!canAdd(sizeof(T))) {
 			return;
 		}

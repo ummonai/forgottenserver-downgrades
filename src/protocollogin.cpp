@@ -18,6 +18,7 @@ extern Game g_game;
 
 void ProtocolLogin::disconnectClient(const std::string& message)
 {
+    std::cout << "[DEBUG] " << __PRETTY_FUNCTION__ << std::endl;
 	auto output = OutputMessagePool::getOutputMessage();
 
 	output->addByte(0x0A);
@@ -29,6 +30,7 @@ void ProtocolLogin::disconnectClient(const std::string& message)
 
 void ProtocolLogin::getCharacterList(const std::string& accountName, const std::string& password)
 {
+    std::cout << "[DEBUG] " << __PRETTY_FUNCTION__ << std::endl;
 	Database& db = Database::getInstance();
 
 	DBResult_ptr result = db.storeQuery(fmt::format(
@@ -94,7 +96,7 @@ void ProtocolLogin::getCharacterList(const std::string& accountName, const std::
 // Character list request
 void ProtocolLogin::onRecvFirstMessage(NetworkMessage& msg)
 {
-	std::cout << "ProtocolLogin::onRecvFirstMessage()" << std::endl;
+    std::cout << "[DEBUG] " << __PRETTY_FUNCTION__ << std::endl;
 	if (g_game.getGameState() == GAME_STATE_SHUTDOWN) {
 		disconnect();
 		return;
@@ -126,9 +128,19 @@ void ProtocolLogin::onRecvFirstMessage(NetworkMessage& msg)
 	 */
 
 	if (!Protocol::RSA_decrypt(msg)) {
+    	std::cout << "ProtocolLogin::onRecvFirstMessage failed decrypt RSA" << std::endl;
 		disconnect();
 		return;
 	}
+
+	// print decrypted
+	std::cout << "ProtocolLogin::onRecvFirstMessage decrypted packet: ";
+	for(uint32_t i=0; i<msg.getLength()+ 8; ++i) //+INITIAL_BUFFER_POSITION
+	{
+		std::cout << std::hex << std::setw(2) << std::setfill('0') << static_cast<uint32_t>(*(msg.getBuffer() + i)) << " ";
+	}
+	std::cout << std::dec << std::endl;
+	// --
 
 	xtea::key key;
 	key[0] = msg.get<uint32_t>();
@@ -159,6 +171,7 @@ void ProtocolLogin::onRecvFirstMessage(NetworkMessage& msg)
 	}
 
 	if (const auto& banInfo = IOBan::getIpBanInfo(connection->getIP())) {
+    std::cout << "[DEBUG] " << __PRETTY_FUNCTION__ << std::endl;
 		disconnectClient(fmt::format("Your IP has been banned until {:s} by {:s}.\n\nReason specified:\n{:s}",
 		                             formatDateShort(banInfo->expiresAt), banInfo->bannedBy, banInfo->reason));
 		return;
