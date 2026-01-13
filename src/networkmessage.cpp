@@ -62,7 +62,7 @@ void NetworkMessage::addDouble(double value, uint8_t precision /* = 2*/)
 
 void NetworkMessage::addBytes(const char* bytes, size_t size)
 {
-	std::cout << "addBytes: X" << std::endl;
+	std::cout << "addBytes: size " << size << std::endl;
 	if (!canAdd(size) || size > 8192) {
 		return;
 	}
@@ -74,7 +74,12 @@ void NetworkMessage::addBytes(const char* bytes, size_t size)
 
 void NetworkMessage::addPaddingBytes(size_t n)
 {
-	std::cout << "addPaddingBytes: count " << static_cast<uint32_t>(n) << std::endl;
+	std::cout << "addPaddingBytes:";
+	for(uint32_t i=0; i<n; ++i) {
+		std::cout << "33 ";
+	}
+	std::cout << std::endl;
+
 	if (!canAdd(n)) {
 		return;
 	}
@@ -93,12 +98,14 @@ void NetworkMessage::addPosition(const Position& pos)
 
 void NetworkMessage::addItem(uint16_t id, uint8_t count)
 {
-	std::cout << "addItem: X" << std::endl;
 	const ItemType& it = Item::items[id];
+
+	std::cout << "addItem: " << std::hex << std::setw(4) << std::setfill('0') << static_cast<uint32_t>(it.clientId) << std::dec << std::endl;
 
 	add<uint16_t>(it.clientId);
 
 	if (it.stackable) {
+		std::cout << "addItem it.stackable true" << std::endl;
 		addByte(count);
 	}/* else if (it.isSplash() || it.isFluidContainer()) {
 		addByte(fluidMap[count & 7]);
@@ -107,8 +114,9 @@ void NetworkMessage::addItem(uint16_t id, uint8_t count)
 
 void NetworkMessage::addItem(const Item* item)
 {
-	std::cout << "addItem: Y" << std::endl;
 	const ItemType& it = Item::items[item->getID()];
+
+	std::cout << "addItem: " << std::hex << std::setw(4) << std::setfill('0') << static_cast<uint32_t>(it.clientId) << std::dec << std::endl;
 
 	add<uint16_t>(it.clientId);
 
@@ -118,14 +126,17 @@ void NetworkMessage::addItem(const Item* item)
 	} else if (it.isSplash() || it.isFluidContainer()) {
 		addByte(fluidMap[item->getFluidType() & 7]);
 	}*/
+
 	if (it.stackable) {
+		std::cout << "addItem it.stackable true" << std::endl;
 		addByte(std::min<uint16_t>(0xFF, item->getItemCount()));
 	} else if (it.isSplash() || it.isFluidContainer()) {
+		std::cout << "addItem it.isSplash() || it.isFluidContainer() true" << std::endl;
 		addByte(item->getSubType());
 	}
 }
 
 void NetworkMessage::addItemId(uint16_t itemId) { 
-	std::cout << "addItem: Z" << std::endl;
+	std::cout << "addItem: " << std::hex << std::setw(4) << std::setfill('0') << static_cast<uint32_t>(itemId) << std::dec << std::endl;
 	add<uint16_t>(Item::items[itemId].clientId); 
 }

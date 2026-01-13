@@ -4,6 +4,7 @@
 #ifndef FS_NETWORKMESSAGE_H
 #define FS_NETWORKMESSAGE_H
 
+#include <cxxabi.h>
 #include "const.h"
 
 class Item;
@@ -92,9 +93,20 @@ public:
 	}
 
 	template <typename T>
+	std::string get_real_typename() 
+	{
+		int status;
+		// demangle the name
+		char* demangled = abi::__cxa_demangle(typeid(T).name(), 0, 0, &status);
+		std::string name = (status == 0) ? demangled : typeid(T).name();
+		free(demangled);
+		return name;
+	}
+
+	template <typename T>
 	void add(T value)
 	{
-		std::cout << "add<" << typeid(T).name() << ">: " << std::hex << std::setw(2) << std::setfill('0') << static_cast<uint32_t>(value) << std::dec << std::endl;
+		std::cout << "add<" << get_real_typename<T>() << ">: " << std::hex << std::setw(2) << std::setfill('0') << static_cast<uint32_t>(value) << std::dec << std::endl;
 		if (!canAdd(sizeof(T))) {
 			return;
 		}

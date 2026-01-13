@@ -141,7 +141,7 @@ void ProtocolGame::login(uint32_t characterId, uint32_t accountId, OperatingSyst
 		}
 
 		if (IOBan::isPlayerNamelocked(player->getGUID())) {
-    std::cout << "[DEBUG] " << __PRETTY_FUNCTION__ << std::endl;
+    		std::cout << "[DEBUG] player namelocked" << std::endl;
 			disconnectClient("Your character has been namelocked.");
 			return;
 		}
@@ -164,7 +164,7 @@ void ProtocolGame::login(uint32_t characterId, uint32_t accountId, OperatingSyst
 
 		if (!player->hasFlag(PlayerFlag_CannotBeBanned)) {
 			if (const auto& banInfo = IOBan::getAccountBanInfo(accountId)) {
-    std::cout << "[DEBUG] " << __PRETTY_FUNCTION__ << std::endl;
+				std::cout << "[DEBUG] account banned" << std::endl;
 				if (banInfo->expiresAt > 0) {
 					disconnectClient(
 					    fmt::format("Your account has been banned until {:s} by {:s}.\n\nReason specified:\n{:s}",

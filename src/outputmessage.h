@@ -20,7 +20,7 @@ public:
 	uint8_t* getOutputBuffer() { return &buffer[outputBufferStart]; }
 
 	void writeMessageLength() { 
-		std::cout << "writeMessageLength: " << std::hex << std::setw(4) << std::setfill('0') << static_cast<uint32_t>(info.length) << std::dec << std::endl;
+		std::cout << "OutputMessage writeMessageLength: " << std::hex << std::setw(4) << std::setfill('0') << static_cast<uint32_t>(info.length) << std::dec << std::endl;
 		add_header(info.length); 
 	}
 
@@ -54,6 +54,7 @@ public:
 
 	void append(const NetworkMessage& msg)
 	{
+		std::cout << "OutputMessage append" << std::endl;
 		auto msgLen = msg.getLength();
 		std::memcpy(buffer.data() + info.position, msg.getBuffer() + 8, msgLen);
 		info.length += msgLen;
@@ -62,6 +63,7 @@ public:
 
 	void append(const OutputMessage_ptr& msg)
 	{
+		std::cout << "OutputMessage append ptr" << std::endl;
 		auto msgLen = msg->getLength();
 		std::memcpy(buffer.data() + info.position, msg->getBuffer() + 8, msgLen);
 		info.length += msgLen;
@@ -72,11 +74,14 @@ private:
 	template <typename T>
 	void add_header(T add)
 	{
+		std::cout << "OutputMessage add_header bytes: " << sizeof(T) << std::endl;
 		assert(outputBufferStart >= sizeof(T));
 		outputBufferStart -= sizeof(T);
 		std::memcpy(buffer.data() + outputBufferStart, &add, sizeof(T));
 		// added header size to the message size
 		info.length += sizeof(T);
+		std::cout << "OutputMessage outputBufferStart: " << outputBufferStart << std::endl;
+		std::cout << "OutputMessage info.length: " << info.length << std::endl;
 	}
 
 	MsgSize_t outputBufferStart = INITIAL_BUFFER_POSITION;
