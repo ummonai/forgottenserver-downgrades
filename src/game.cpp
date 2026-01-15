@@ -504,7 +504,7 @@ bool Game::placeCreature(Creature* creature, const Position& pos, bool extendedP
 	map.getSpectators(spectators, creature->getPosition(), true);
 	for (Creature* spectator : spectators) {
 		if (Player* tmpPlayer = spectator->getPlayer()) {
-			tmpPlayer->sendCreatureAppear(creature, creature->getPosition(), magicEffect);
+			tmpPlayer->sendCreatureAppear(creature, creature->getPosition(), magicEffect != CONST_ME_NONE);
 		}
 	}
 

@@ -104,12 +104,10 @@ void NetworkMessage::addItem(uint16_t id, uint8_t count)
 
 	add<uint16_t>(it.clientId);
 
-	if (it.stackable) {
+	if (it.stackable || it.isSplash() || it.isFluidContainer()) {
 		std::cout << "addItem it.stackable true" << std::endl;
 		addByte(count);
-	}/* else if (it.isSplash() || it.isFluidContainer()) {
-		addByte(fluidMap[count & 7]);
-	} */
+	}
 }
 
 void NetworkMessage::addItem(const Item* item)
