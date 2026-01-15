@@ -1862,6 +1862,7 @@ void LuaScriptInterface::registerFunctions()
 	registerEnum(L, FLUID_TEA);
 	registerEnum(L, FLUID_MEAD);
 
+	/*
 	registerEnum(L, TALKTYPE_SAY);
 	registerEnum(L, TALKTYPE_WHISPER);
 	registerEnum(L, TALKTYPE_YELL);
@@ -1874,6 +1875,19 @@ void LuaScriptInterface::registerFunctions()
 	registerEnum(L, TALKTYPE_MONSTER_SAY);
 	registerEnum(L, TALKTYPE_MONSTER_YELL);
 	registerEnum(L, TALKTYPE_CHANNEL_R2);
+	*/
+	registerEnum(L, TALKTYPE_SAY)
+	registerEnum(L, TALKTYPE_WHISPER)
+	registerEnum(L, TALKTYPE_YELL)
+	registerEnum(L, TALKTYPE_PRIVATE)
+	registerEnum(L, TALKTYPE_PRIVATE_RED)
+	registerEnum(L, TALKTYPE_CHANNEL_Y)
+	registerEnum(L, TALKTYPE_CHANNEL_O)
+	registerEnum(L, TALKTYPE_BROADCAST)
+	registerEnum(L, TALKTYPE_CHANNEL_R1)
+	registerEnum(L, TALKTYPE_MONSTER_SAY)
+	registerEnum(L, TALKTYPE_MONSTER_YELL)
+	registerEnum(L, TALKTYPE_CHANNEL_R2)
 
 	registerEnum(L, TEXTCOLOR_BLUE);
 	registerEnum(L, TEXTCOLOR_LIGHTGREEN);

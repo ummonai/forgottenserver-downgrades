@@ -3320,7 +3320,8 @@ void Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type, c
 		return;
 	}
 
-	if (type == TALKTYPE_PRIVATE_PN) {
+	//if (type == TALKTYPE_PRIVATE_PN) {
+	if (type != TALKTYPE_PRIVATE) {
 		playerSpeakToNpc(player, text);
 		return;
 	}
@@ -3502,7 +3503,7 @@ void Game::playerSpeakToNpc(Player* player, const std::string& text)
 	map.getSpectators(spectators, player->getPosition());
 	for (Creature* spectator : spectators) {
 		if (spectator->getNpc()) {
-			spectator->onCreatureSay(player, TALKTYPE_PRIVATE_PN, text);
+			spectator->onCreatureSay(player, TALKTYPE_PRIVATE, text);
 		}
 	}
 }

@@ -132,40 +132,78 @@ enum ShootType_t : uint8_t
 	CONST_ANI_WEAPONTYPE = 0xFE, // 254
 };
 
-enum SpeakClasses : uint8_t
-{
+
+// enum SpeakClasses : uint8_t
+// {
+// 	TALKTYPE_SAY = 1,
+// 	TALKTYPE_WHISPER = 2,
+// 	TALKTYPE_YELL = 3,
+// 	TALKTYPE_PRIVATE_PN = 4,
+// 	TALKTYPE_PRIVATE_NP = 5,
+// 	TALKTYPE_PRIVATE = 6,
+// 	TALKTYPE_CHANNEL_Y = 7,
+// 	TALKTYPE_CHANNEL_W = 8,
+// 	TALKTYPE_RVR_CHANNEL = 9,
+// 	TALKTYPE_RVR_ANSWER = 10,
+// 	TALKTYPE_RVR_CONTINUE = 11,
+// 	TALKTYPE_BROADCAST = 12,
+// 	TALKTYPE_CHANNEL_R1 = 13,  // red - #c text
+// 	TALKTYPE_PRIVATE_RED = 14, //@name@text
+// 	TALKTYPE_CHANNEL_O = 15,   //@name@text
+// 	TALKTYPE_CHANNEL_R2 = 17,  // #d
+// 	TALKTYPE_MONSTER_SAY = 19,
+// 	TALKTYPE_MONSTER_YELL = 20,
+// };
+
+// enum MessageClasses : uint8_t
+// {
+// 	MESSAGE_STATUS_CONSOLE_RED = 18,    /*Red message in the console*/
+// 	MESSAGE_EVENT_ORANGE = 19,          /*Orange message in the console*/
+// 	MESSAGE_STATUS_CONSOLE_ORANGE = 20, /*Orange message in the console*/
+// 	MESSAGE_STATUS_WARNING = 21,        /*Red message in game window and in the console*/
+// 	MESSAGE_EVENT_ADVANCE = 22,         /*White message in game window and in the console*/
+// 	MESSAGE_EVENT_DEFAULT = 23,         /*White message at the bottom of the game window and in the console*/
+// 	MESSAGE_STATUS_DEFAULT = 24,        /*White message at the bottom of the game window and in the console*/
+// 	MESSAGE_INFO_DESCR = 25,            /*Green message in game window and in the console*/
+// 	MESSAGE_STATUS_SMALL = 26,          /*White message at the bottom of the game window"*/
+// 	MESSAGE_STATUS_CONSOLE_BLUE = 27,   /*FIXME Blue message in the console*/
+// };
+
+
+enum SpeakClasses : uint8_t {
 	TALKTYPE_SAY = 1,
 	TALKTYPE_WHISPER = 2,
 	TALKTYPE_YELL = 3,
-	TALKTYPE_PRIVATE_PN = 4,
-	TALKTYPE_PRIVATE_NP = 5,
-	TALKTYPE_PRIVATE = 6,
-	TALKTYPE_CHANNEL_Y = 7,
-	TALKTYPE_CHANNEL_W = 8,
-	TALKTYPE_RVR_CHANNEL = 9,
-	TALKTYPE_RVR_ANSWER = 10,
-	TALKTYPE_RVR_CONTINUE = 11,
-	TALKTYPE_BROADCAST = 12,
-	TALKTYPE_CHANNEL_R1 = 13,  // red - #c text
-	TALKTYPE_PRIVATE_RED = 14, //@name@text
-	TALKTYPE_CHANNEL_O = 15,   //@name@text
-	TALKTYPE_CHANNEL_R2 = 17,  // #d
-	TALKTYPE_MONSTER_SAY = 19,
-	TALKTYPE_MONSTER_YELL = 20,
+	TALKTYPE_PRIVATE = 4,
+	TALKTYPE_CHANNEL_Y = 5,
+	TALKTYPE_RVR_CHANNEL = 6,
+	TALKTYPE_RVR_ANSWER = 7,
+	TALKTYPE_RVR_CONTINUE = 8,
+	TALKTYPE_BROADCAST = 9,
+	TALKTYPE_CHANNEL_R1 = 10, //red - #c text
+	TALKTYPE_PRIVATE_RED = 11, //@name@text
+	TALKTYPE_CHANNEL_O = 12, //@name@text
+	TALKTYPE_CHANNEL_R2 = 14, //#d
+	TALKTYPE_MONSTER_SAY = 17,
+	TALKTYPE_MONSTER_YELL = 17,
 };
 
-enum MessageClasses : uint8_t
-{
-	MESSAGE_STATUS_CONSOLE_RED = 18,    /*Red message in the console*/
-	MESSAGE_EVENT_ORANGE = 19,          /*Orange message in the console*/
-	MESSAGE_STATUS_CONSOLE_ORANGE = 20, /*Orange message in the console*/
-	MESSAGE_STATUS_WARNING = 21,        /*Red message in game window and in the console*/
-	MESSAGE_EVENT_ADVANCE = 22,         /*White message in game window and in the console*/
-	MESSAGE_EVENT_DEFAULT = 23,         /*White message at the bottom of the game window and in the console*/
-	MESSAGE_STATUS_DEFAULT = 24,        /*White message at the bottom of the game window and in the console*/
-	MESSAGE_INFO_DESCR = 25,            /*Green message in game window and in the console*/
-	MESSAGE_STATUS_SMALL = 26,          /*White message at the bottom of the game window"*/
-	MESSAGE_STATUS_CONSOLE_BLUE = 27,   /*FIXME Blue message in the console*/
+enum MessageClasses : uint8_t {
+	MESSAGE_STATUS_CONSOLE_YELLOW = 1, /*Yellow message in the console*/
+	MESSAGE_STATUS_CONSOLE_LIGHTBLUE = 4, /*Light blue message in the console*/
+	MESSAGE_STATUS_CONSOLE_ORANGE = 17, /*Orange message in the console*/
+	MESSAGE_STATUS_WARNING = 18, /*Red message in game window and in the console*/
+
+	MESSAGE_EVENT_ADVANCE = 19, /*White message in game window and in the console*/
+	MESSAGE_EVENT_DEFAULT = 20, /*White message at the bottom of the game window and in the console*/
+
+	MESSAGE_STATUS_DEFAULT = 21, /*White message at the bottom of the game window and in the console*/
+
+	MESSAGE_INFO_DESCR = 22, /*Green message in game window and in the console*/
+
+	MESSAGE_STATUS_SMALL = 23, /*White message at the bottom of the game window"*/
+	MESSAGE_STATUS_CONSOLE_BLUE = 24, /*Blue message in the console*/
+	MESSAGE_STATUS_CONSOLE_RED = 25, /*Red message in the console*/
 };
 
 enum FluidColors_t : uint8_t

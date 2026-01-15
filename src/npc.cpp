@@ -439,8 +439,10 @@ void Npc::doSay(const std::string& text) { g_game.internalCreatureSay(this, TALK
 void Npc::doSayToPlayer(Player* player, const std::string& text)
 {
 	if (player) {
-		player->sendCreatureSay(this, TALKTYPE_PRIVATE_NP, text);
-		player->onCreatureSay(this, TALKTYPE_PRIVATE_NP, text);
+		// player->sendCreatureSay(this, TALKTYPE_PRIVATE_NP, text);
+		// player->onCreatureSay(this, TALKTYPE_PRIVATE_NP, text);
+		player->sendCreatureSay(this, TALKTYPE_SAY, text);
+		player->onCreatureSay(this, TALKTYPE_SAY, text);
 	}
 }
 

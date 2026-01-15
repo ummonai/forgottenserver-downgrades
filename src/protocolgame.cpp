@@ -1843,16 +1843,10 @@ void ProtocolGame::sendCreatureSay(const Creature* creature, SpeakClasses type, 
 	std::cout << "[DEBUG] " << __PRETTY_FUNCTION__ << std::endl;
 	NetworkMessage msg;
 	msg.addByte(0xAA);
-	msg.add<uint32_t>(0x00);
+	static uint32_t statementId = 0;
+	msg.add<uint32_t>(++statementId);
 
 	msg.addString(creature->getName());
-
-	// Add level only for players
-	if (const Player* speaker = creature->getPlayer()) {
-		msg.add<uint16_t>(speaker->getLevel());
-	} else {
-		msg.add<uint16_t>(0x00);
-	}
 
 	msg.addByte(type);
 	if (pos) {
@@ -1871,20 +1865,12 @@ void ProtocolGame::sendToChannel(const Creature* creature, SpeakClasses type, co
 	std::cout << "[DEBUG] " << __PRETTY_FUNCTION__ << std::endl;
 	NetworkMessage msg;
 	msg.addByte(0xAA);
-	msg.add<uint32_t>(0x00);
-
-	if (type == TALKTYPE_CHANNEL_R2) {
-		msg.addString("");
-		type = TALKTYPE_CHANNEL_R1;
+	static uint32_t statementId = 0;
+	msg.add<uint32_t>(++statementId);
+	if (!creature) {
+		msg.add<uint32_t>(0x00);
 	} else {
 		msg.addString(creature->getName());
-
-		// Add level only for players
-		if (const Player* speaker = creature->getPlayer()) {
-			msg.add<uint16_t>(speaker->getLevel());
-		} else {
-			msg.add<uint16_t>(0x00);
-		}
 	}
 
 	msg.addByte(type);
@@ -1902,7 +1888,6 @@ void ProtocolGame::sendPrivateMessage(const Player* speaker, SpeakClasses type, 
 	msg.add<uint32_t>(++statementId);
 	if (speaker) {
 		msg.addString(speaker->getName());
-		msg.add<uint16_t>(speaker->getLevel());
 	} else {
 		msg.add<uint32_t>(0x00);
 	}
