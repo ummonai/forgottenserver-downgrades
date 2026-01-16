@@ -3321,10 +3321,10 @@ void Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type, c
 	}
 
 	//if (type == TALKTYPE_PRIVATE_PN) {
-	if (type != TALKTYPE_PRIVATE) {
-		playerSpeakToNpc(player, text);
-		return;
-	}
+	// if (type != TALKTYPE_PRIVATE) {
+	// 	playerSpeakToNpc(player, text);
+	// 	return;
+	// }
 
 	uint32_t muteTime = player->isMuted();
 	if (muteTime > 0) {
@@ -3339,11 +3339,6 @@ void Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type, c
 	player->removeMessageBuffer();
 
 	switch (type) {
-		case TALKTYPE_PRIVATE:
-		case TALKTYPE_PRIVATE_RED:
-			playerSpeakTo(player, type, receiver, text);
-			break;
-
 		case TALKTYPE_SAY:
 			internalCreatureSay(player, TALKTYPE_SAY, text, false);
 			break;
@@ -3355,7 +3350,11 @@ void Game::playerSay(uint32_t playerId, uint16_t channelId, SpeakClasses type, c
 		case TALKTYPE_YELL:
 			playerYell(player, text);
 			break;
-
+			
+		case TALKTYPE_PRIVATE:
+		case TALKTYPE_PRIVATE_RED:
+			playerSpeakTo(player, type, receiver, text);
+			break;
 		case TALKTYPE_CHANNEL_O:
 		case TALKTYPE_CHANNEL_Y:
 		case TALKTYPE_CHANNEL_R1:
