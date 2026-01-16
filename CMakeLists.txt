@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.19)
 
+cmake_policy(SET CMP0167 OLD)
+
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)
 
@@ -13,7 +15,7 @@ endif()
 
 set(BOOST_REQUIRED_VERSION 1.71.0)
 
-option(HTTP "Enable HTTP support" ON)
+option(HTTP "Enable HTTP support" OFF)
 if (HTTP)
     list(APPEND VCPKG_MANIFEST_FEATURES "http")
     set(BOOST_REQUIRED_VERSION 1.75.0)
