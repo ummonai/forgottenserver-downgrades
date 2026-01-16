@@ -38,18 +38,18 @@ Container::Container(Tile* tile) : Container(ITEM_BROWSEFIELD, 30, false, true)
 
 Container::~Container()
 {
-	if (getID() == ITEM_BROWSEFIELD) {
-		g_game.browseFields.erase(getTile());
+	// if (getID() == ITEM_BROWSEFIELD) {
+	// 	g_game.browseFields.erase(getTile());
 
-		for (Item* item : itemlist) {
-			item->setParent(parent);
-		}
-	} else {
+	// 	for (Item* item : itemlist) {
+	// 		item->setParent(parent);
+	// 	}
+	// } else {
 		for (Item* item : itemlist) {
 			item->setParent(nullptr);
 			item->decrementReferenceCounter();
 		}
-	}
+	// }
 }
 
 Item* Container::clone() const
@@ -77,7 +77,10 @@ std::string Container::getName(bool addArticle /* = false*/) const
 	return getNameDescription(it, this, -1, addArticle);
 }
 
-bool Container::hasParent() const { return getID() != ITEM_BROWSEFIELD && !dynamic_cast<const Player*>(getParent()); }
+bool Container::hasParent() const { 
+	//return getID() != ITEM_BROWSEFIELD && !dynamic_cast<const Player*>(getParent());
+	return dynamic_cast<const Player*>(getParent());
+}
 
 void Container::addItem(Item* item)
 {
@@ -248,7 +251,26 @@ ReturnValue Container::queryAdd(int32_t index, const Thing& thing, uint32_t coun
 		return RETURNVALUE_THISISIMPOSSIBLE;
 	}
 
+	// // quiver: allow ammo only
+	// if (getWeaponType() == WEAPON_QUIVER && item->getWeaponType() != WEAPON_AMMO) {
+	// 	return RETURNVALUE_QUIVERAMMOONLY;
+	// }
+
+	// // store items can be only moved into depot chest or store inbox
+	// if (item->isStoreItem() && !dynamic_cast<const DepotChest*>(this)) {
+	// 	return RETURNVALUE_ITEMCANNOTBEMOVEDTHERE;
+	// }
+
 	const Cylinder* cylinder = getParent();
+
+	// // don't allow moving items into container that is store item and is in store inbox
+	// if (isStoreItem() && dynamic_cast<const StoreInbox*>(cylinder)) {
+	// 	ReturnValue ret = RETURNVALUE_ITEMCANNOTBEMOVEDTHERE;
+	// 	if (!item->isStoreItem()) {
+	// 		ret = RETURNVALUE_CANNOTMOVEITEMISNOTSTOREITEM;
+	// 	}
+	// 	return ret;
+	// }
 
 	if (!hasBitSet(FLAG_NOLIMIT, flags)) {
 		while (cylinder) {
