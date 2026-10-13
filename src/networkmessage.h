@@ -163,7 +163,9 @@ private:
 
 	bool canRead(int32_t size)
 	{
-		if ((info.position + size) > (info.length + 8) || size >= (NETWORKMESSAGE_MAXSIZE - info.position)) {
+		// 7.72 has no checksum, so after xtea decryption the body starts at offset 4 (2 bytes packet size + 2 bytes
+		// inner size) instead of 8
+		if ((info.position + size) > (info.length + 4) || size >= (NETWORKMESSAGE_MAXSIZE - info.position)) {
 			info.overrun = true;
 			return false;
 		}

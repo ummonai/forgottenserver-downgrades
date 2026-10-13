@@ -110,10 +110,14 @@ add_executable(tfs ${tfs_MAIN})
 target_link_libraries(tfs tfslib)
 
 ### INTERPROCEDURAL_OPTIMIZATION ###
+# LTO linking needs a lot of memory, disable it on small machines with -DENABLE_LTO=OFF
+option(ENABLE_LTO "Enable link time optimization" ON)
 cmake_policy(SET CMP0069 NEW)
 include(CheckIPOSupported)
 check_ipo_supported(RESULT result OUTPUT error)
-if (result)
+if (NOT ENABLE_LTO)
+    message(STATUS "IPO / LTO disabled")
+elseif (result)
     set(ENABLE_IPO ON)
     set_target_properties(tfs PROPERTIES INTERPROCEDURAL_OPTIMIZATION True)
     message(STATUS "IPO / LTO enabled")

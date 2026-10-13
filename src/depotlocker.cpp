@@ -6,6 +6,7 @@
 #include "depotlocker.h"
 
 #include "inbox.h"
+#include "tools.h"
 
 DepotLocker::DepotLocker(uint16_t type) : Container(type), depotId(0) {}
 
@@ -20,8 +21,12 @@ Attr_ReadValue DepotLocker::readAttr(AttrTypes_t attr, PropStream& propStream)
 	return Item::readAttr(attr, propStream);
 }
 
-ReturnValue DepotLocker::queryAdd(int32_t, const Thing&, uint32_t, uint32_t, Creature*) const
+ReturnValue DepotLocker::queryAdd(int32_t, const Thing&, uint32_t, uint32_t flags, Creature*) const
 {
+	// items can not be put into the locker itself, but into the depot chest inside it (the chest asks its top parent)
+	if (hasBitSet(FLAG_CHILDISOWNER, flags)) {
+		return RETURNVALUE_NOERROR;
+	}
 	return RETURNVALUE_NOTENOUGHROOM;
 }
 

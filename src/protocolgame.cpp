@@ -1017,7 +1017,7 @@ void ProtocolGame::parseSetOutfit(NetworkMessage& msg)
 	newOutfit.lookBody = msg.getByte();
 	newOutfit.lookLegs = msg.getByte();
 	newOutfit.lookFeet = msg.getByte();
-	newOutfit.lookAddons = msg.getByte();
+	// 7.72 has no addons
 
 	g_dispatcher.addTask(
 		[=, playerID = player->getID()]() { g_game.playerChangeOutfit(playerID, newOutfit); });
@@ -1545,8 +1545,8 @@ void ProtocolGame::sendContainer(uint8_t cid, const Container* container, bool h
 
 	// 7.72 has no container pagination, the client only accepts as many items as the container has slots
 	(void)firstIndex;
-	uint8_t itemsToSend = std::min<uint32_t>(
-	    {container->capacity(), container->size(), std::numeric_limits<uint8_t>::max()});
+	uint8_t itemsToSend = std::min<uint32_t>({container->capacity(), static_cast<uint32_t>(container->size()),
+	                                          std::numeric_limits<uint8_t>::max()});
 	msg.addByte(itemsToSend);
 	for (auto it = container->getItemList().begin(), end = it + itemsToSend; it != end; ++it) {
 		msg.addItem(*it);

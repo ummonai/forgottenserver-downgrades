@@ -73,7 +73,8 @@ function Container:getContentDescription()
 	if items and #items > 0 then
 		local loot = {}
 		for i = 1, #items do
-			loot[#loot + 1] = string.format("{%d|%s}", items[i]:getType():getClientId(), items[i]:getNameDescription(items[i]:getSubType(), true))
+			-- 7.72 client does not support item links ({clientId|name}) in messages
+			loot[#loot + 1] = items[i]:getNameDescription(items[i]:getSubType(), true)
 		end
 
 		return table.concat(loot, ", ")
