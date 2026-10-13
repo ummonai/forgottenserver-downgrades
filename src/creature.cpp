@@ -475,8 +475,8 @@ void Creature::onCreatureMove(Creature* creature, const Tile* newTile, const Pos
 				// floor change extra cost
 				lastStepCost = 2;
 			} else if (newPos.getDistanceX(oldPos) >= 1 && newPos.getDistanceY(oldPos) >= 1) {
-				// diagonal extra cost
-				lastStepCost = 3;
+				// diagonal extra cost (7.72 client expects double step time for players)
+				lastStepCost = getPlayer() ? 2 : 3;
 			}
 		} else {
 			stopEventWalk();
@@ -1409,7 +1409,7 @@ int64_t Creature::getStepDuration(Direction dir) const
 {
 	int64_t stepDuration = getStepDuration();
 	if ((dir & DIRECTION_DIAGONAL_MASK) != 0) {
-		stepDuration *= 3;
+		stepDuration *= 2;
 	}
 	return stepDuration;
 }

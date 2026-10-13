@@ -230,6 +230,10 @@ enum ShootType_t : uint8_t
 	CONST_ANI_WEAPONTYPE = 0xFE, // 254
 };
 
+// highest magic effect and missile known by the 7.72 client, anything above makes it crash
+static constexpr uint8_t CLIENT_ME_LAST = CONST_ME_SOUND_WHITE;
+static constexpr uint8_t CLIENT_ANI_LAST = CONST_ANI_POISON;
+
 
 // enum SpeakClasses : uint8_t
 // {

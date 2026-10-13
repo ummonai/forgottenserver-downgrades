@@ -12,7 +12,8 @@
 extern Game g_game;
 extern LuaEnvironment g_luaEnvironment;
 
-uint32_t Npc::npcAutoID = 0x20000000;
+// 7.72 client recognizes creature kinds by id range (see monster.cpp)
+uint32_t Npc::npcAutoID = 0x80000000;
 
 namespace Npcs {
 bool loaded = false;

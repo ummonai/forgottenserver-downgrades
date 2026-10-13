@@ -99,7 +99,6 @@ void Connection::accept(Protocol_ptr protocol)
 
 void Connection::accept()
 {
-	std::cout << "Connection::accept" << std::endl;
 	if (connectionState == CONNECTION_STATE_PENDING) {
 		connectionState = CONNECTION_STATE_REQUEST_CHARLIST;
 	}
@@ -133,19 +132,14 @@ void Connection::accept()
 
 void Connection::parseHeader(const boost::system::error_code& error)
 {
-	std::cout << "Connection::parseHeader" << std::endl;
 	std::lock_guard<std::recursive_mutex> lockClass(connectionLock);
 	readTimer.cancel();
 
 	if (error) {
-		std::cout << "Connection::parseHeader A" << std::endl;
-		std::cout << "Connection::parseHeader error.value(): " << error.value()  << std::endl;
-		std::cout << "Connection::parseHeader error.message(): " << error.message() <<  std::endl;
 
 		close(FORCE_CLOSE);
 		return;
 	} else if (connectionState == CONNECTION_STATE_DISCONNECTED) {
-		std::cout << "Connection::parseHeader B" << std::endl;
 		return;
 	}
 
@@ -161,20 +155,17 @@ void Connection::parseHeader(const boost::system::error_code& error)
 	}
 
 	if (timePassed > 2) {
-		std::cout << "Connection::parseHeader I" << std::endl;
 		timeConnected = time(nullptr);
 		packetsSent = 0;
 	}
 
 	uint16_t size = msg.getLengthHeader();
 	if (size == 0 || size >= NETWORKMESSAGE_MAXSIZE - 16) {
-		std::cout << "Connection::parseHeader J" << std::endl;
 		close(FORCE_CLOSE);
 		return;
 	}
 
 	try {
-		std::cout << "Connection::parseHeader K" << std::endl;
 		readTimer.expires_after(std::chrono::seconds(CONNECTION_READ_TIMEOUT));
 		readTimer.async_wait(
 		    [thisPtr = std::weak_ptr<Connection>(shared_from_this())](const boost::system::error_code& error) {
@@ -196,7 +187,6 @@ void Connection::parseHeader(const boost::system::error_code& error)
 
 void Connection::parsePacket(const boost::system::error_code& error)
 {
-	std::cout << "Connection::parsePacket" << std::endl;
 	std::lock_guard<std::recursive_mutex> lockClass(connectionLock);
 	readTimer.cancel();
 

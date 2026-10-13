@@ -4,7 +4,6 @@
 #ifndef FS_NETWORKMESSAGE_H
 #define FS_NETWORKMESSAGE_H
 
-#include <cxxabi.h>
 #include "const.h"
 
 class Item;
@@ -40,10 +39,7 @@ public:
 		MAX_PROTOCOL_BODY_LENGTH = MAX_BODY_LENGTH - 10
 	};
 
-	//NetworkMessage() = default;
-	NetworkMessage() {
-		std::cout << "- new NetworkMessage -" << std::endl;
-	}
+	NetworkMessage() = default;
 
 	void reset() { info = {}; }
 
@@ -83,7 +79,6 @@ public:
 	// simply write functions for outgoing message
 	void addByte(uint8_t value)
 	{
-		std::cout << "addByte: " << std::hex << std::setw(2) << std::setfill('0') << static_cast<uint32_t>(value) << std::dec << std::endl;
 		if (!canAdd(1)) {
 			return;
 		}
@@ -93,20 +88,8 @@ public:
 	}
 
 	template <typename T>
-	std::string get_real_typename() 
-	{
-		int status;
-		// demangle the name
-		char* demangled = abi::__cxa_demangle(typeid(T).name(), 0, 0, &status);
-		std::string name = (status == 0) ? demangled : typeid(T).name();
-		free(demangled);
-		return name;
-	}
-
-	template <typename T>
 	void add(T value)
 	{
-		std::cout << "add<" << get_real_typename<T>() << ">: " << std::hex << std::setw(2) << std::setfill('0') << static_cast<uint32_t>(value) << std::dec << std::endl;
 		if (!canAdd(sizeof(T))) {
 			return;
 		}

@@ -77,9 +77,10 @@ std::string Container::getName(bool addArticle /* = false*/) const
 	return getNameDescription(it, this, -1, addArticle);
 }
 
-bool Container::hasParent() const { 
-	//return getID() != ITEM_BROWSEFIELD && !dynamic_cast<const Player*>(getParent());
-	return dynamic_cast<const Player*>(getParent());
+bool Container::hasParent() const
+{
+	// 7.72 has no browse field, only containers inside other containers can go up
+	return dynamic_cast<const Container*>(getParent()) != nullptr;
 }
 
 void Container::addItem(Item* item)

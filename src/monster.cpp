@@ -19,7 +19,8 @@ extern Events* g_events;
 int32_t Monster::despawnRange;
 int32_t Monster::despawnRadius;
 
-uint32_t Monster::monsterAutoID = 0x21000000;
+// 7.72 client recognizes creature kinds by id range: players < 0x40000000 <= monsters < 0x80000000 <= npcs
+uint32_t Monster::monsterAutoID = 0x40000000;
 
 Monster* Monster::createMonster(const std::string& name)
 {

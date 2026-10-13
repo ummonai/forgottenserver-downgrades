@@ -335,7 +335,7 @@ public:
 	void removeConditionSuppressions(uint32_t conditions);
 
 	DepotChest* getDepotChest(uint32_t depotId, bool autoCreate);
-	DepotLocker& getDepotLocker();
+	DepotLocker* getDepotLocker(uint32_t depotId);
 	void onReceiveMail() const;
 	bool isNearDepotBox() const;
 
@@ -1049,7 +1049,7 @@ private:
 	SchedulerTask* walkTask = nullptr;
 	Town* town = nullptr;
 	Vocation* vocation = nullptr;
-	DepotLocker_ptr depotLocker = nullptr;
+	std::map<uint32_t, DepotLocker_ptr> depotLockerMap;
 
 	uint32_t inventoryWeight = 0;
 	uint32_t capacity = 40000;

@@ -321,10 +321,10 @@ Creature* Game::getCreatureByID(uint32_t id)
 {
 	if (id <= Player::playerIDLimit) {
 		return getPlayerByID(id);
-	} else if (id <= Npc::npcAutoID) {
-		return getNpcByID(id);
 	} else if (id <= Monster::monsterAutoID) {
 		return getMonsterByID(id);
+	} else if (id <= Npc::npcAutoID) {
+		return getNpcByID(id);
 	}
 	return nullptr;
 }
@@ -2302,27 +2302,10 @@ void Game::playerMoveUpContainer(uint32_t playerId, uint8_t cid)
 		return;
 	}
 
+	// 7.72 has no browse field
 	Container* parentContainer = dynamic_cast<Container*>(container->getRealParent());
 	if (!parentContainer) {
-		Tile* tile = container->getTile();
-		if (!tile) {
-			return;
-		}
-
-		if (!g_events->eventPlayerOnBrowseField(player, tile->getPosition())) {
-			return;
-		}
-
-		auto it = browseFields.find(tile);
-		if (it == browseFields.end()) {
-			parentContainer = new Container(tile);
-			parentContainer->incrementReferenceCounter();
-			browseFields[tile] = parentContainer;
-			g_scheduler.addEvent(createSchedulerTask(
-			    30000, [this, position = tile->getPosition()]() { decreaseBrowseFieldRef(position); }));
-		} else {
-			parentContainer = it->second;
-		}
+		return;
 	}
 
 	player->addContainer(cid, parentContainer);

@@ -535,40 +535,20 @@ function Player.sendWorldLight(self, color, level)
 	return true
 end
 
-function Player.sendWorldTime(self, time)
-	local msg = NetworkMessage()
-	msg:addByte(0xEF)
-	msg:addByte(time / 60) -- hour
-	msg:addByte(time % 60) -- min
-	msg:sendToPlayer(self)
-	msg:delete()
-	return true
-end
+-- client clock, hotkey presets and login music do not exist in 7.72,
+-- sending these packets would crash the client
+function Player.sendWorldTime(self, time) return true end
 
-function Player.sendHotkeyPreset(self)
-	local msg = NetworkMessage()
-	msg:addByte(0x9D)
-	msg:addU32(self:getVocation():getClientId())
-	msg:sendToPlayer(self)
-	return true
-end
+function Player.sendHotkeyPreset(self) return true end
 
-function Player.disableLoginMusic(self)
-	local msg = NetworkMessage()
-	msg:addByte(0x85)
-	msg:addByte(0x01)
-	msg:addByte(0x00)
-	msg:addByte(0x00)
-	msg:sendToPlayer(self)
-	msg:delete()
-	return true
-end
+function Player.disableLoginMusic(self) return true end
 
+-- 7.72 has no inbox, items are delivered to the depot of the player's town
 function Player.sendInboxItems(self, items, containerId)
-	local inbox = self:getInbox()
+	local depotChest = self:getDepotChest(self:getTown():getId(), true)
 	local container = Game.createItem(containerId, 1)
 	for _, item in pairs(items) do
 		container:addItem(item.item, item.count)
 	end
-	container:moveTo(inbox)
+	container:moveTo(depotChest)
 end

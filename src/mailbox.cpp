@@ -6,7 +6,7 @@
 #include "mailbox.h"
 
 #include "game.h"
-#include "inbox.h"
+#include "depotchest.h"
 #include "iologindata.h"
 
 extern Game g_game;
@@ -70,8 +70,8 @@ void Mailbox::postRemoveNotification(Thing* thing, const Cylinder* newParent, in
 
 bool Mailbox::sendItem(Item* item) const
 {
-	std::string receiver;
-	if (!getReceiver(item, receiver)) {
+	std::string receiver, townName;
+	if (!getReceiver(item, receiver, townName)) {
 		return false;
 	}
 
@@ -80,9 +80,16 @@ bool Mailbox::sendItem(Item* item) const
 		return false;
 	}
 
+	// 7.72: parcels and letters are delivered to the depot of the town written on the label
+	Town* town = g_game.map.towns.getTown(townName);
+	if (!town) {
+		return false;
+	}
+
 	Player* player = g_game.getPlayerByName(receiver);
 	if (player) {
-		if (g_game.internalMoveItem(item->getParent(), player->getInbox(), INDEX_WHEREEVER, item, item->getItemCount(),
+		DepotChest* depotChest = player->getDepotChest(town->getID(), true);
+		if (g_game.internalMoveItem(item->getParent(), depotChest, INDEX_WHEREEVER, item, item->getItemCount(),
 		                            nullptr, FLAG_NOLIMIT) == RETURNVALUE_NOERROR) {
 			g_game.transformItem(item, item->getID() + 1);
 			player->onReceiveMail();
@@ -94,8 +101,9 @@ bool Mailbox::sendItem(Item* item) const
 			return false;
 		}
 
-		if (g_game.internalMoveItem(item->getParent(), tmpPlayer.getInbox(), INDEX_WHEREEVER, item,
-		                            item->getItemCount(), nullptr, FLAG_NOLIMIT) == RETURNVALUE_NOERROR) {
+		DepotChest* depotChest = tmpPlayer.getDepotChest(town->getID(), true);
+		if (g_game.internalMoveItem(item->getParent(), depotChest, INDEX_WHEREEVER, item, item->getItemCount(),
+		                            nullptr, FLAG_NOLIMIT) == RETURNVALUE_NOERROR) {
 			g_game.transformItem(item, item->getID() + 1);
 			IOLoginData::savePlayer(&tmpPlayer);
 			return true;
@@ -104,12 +112,12 @@ bool Mailbox::sendItem(Item* item) const
 	return false;
 }
 
-bool Mailbox::getReceiver(Item* item, std::string& name) const
+bool Mailbox::getReceiver(Item* item, std::string& name, std::string& townName) const
 {
 	const Container* container = item->getContainer();
 	if (container) {
 		for (Item* containerItem : container->getItemList()) {
-			if (containerItem->getID() == ITEM_LABEL && getReceiver(containerItem, name)) {
+			if (containerItem->getID() == ITEM_LABEL && getReceiver(containerItem, name, townName)) {
 				return true;
 			}
 		}
@@ -121,8 +129,12 @@ bool Mailbox::getReceiver(Item* item, std::string& name) const
 		return false;
 	}
 
-	name = getFirstLine(text);
+	// first line: receiver, second line: town
+	std::istringstream iss(text);
+	std::getline(iss, name, '\n');
+	std::getline(iss, townName, '\n');
 	boost::algorithm::trim(name);
+	boost::algorithm::trim(townName);
 	return true;
 }
 

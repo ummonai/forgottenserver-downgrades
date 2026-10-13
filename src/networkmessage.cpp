@@ -38,7 +38,6 @@ Position NetworkMessage::getPosition()
 
 void NetworkMessage::addString(std::string_view value)
 {
-	std::cout << "addString: " << value << std::endl;
 	std::string latin1Str = boost::locale::conv::from_utf<char>(value.data(), value.data() + value.size(), "ISO-8859-1",
 	                                                            boost::locale::conv::skip);
 	size_t stringLen = latin1Str.size();
@@ -54,7 +53,6 @@ void NetworkMessage::addString(std::string_view value)
 
 void NetworkMessage::addDouble(double value, uint8_t precision /* = 2*/)
 {
-	std::cout << "addDouble: " << value << std::endl;
 	addByte(precision);
 	add<uint32_t>(static_cast<uint32_t>((value * std::pow(static_cast<float>(10), precision)) +
 	                                    std::numeric_limits<int32_t>::max()));
@@ -62,7 +60,6 @@ void NetworkMessage::addDouble(double value, uint8_t precision /* = 2*/)
 
 void NetworkMessage::addBytes(const char* bytes, size_t size)
 {
-	std::cout << "addBytes: size " << size << std::endl;
 	if (!canAdd(size) || size > 8192) {
 		return;
 	}
@@ -74,12 +71,6 @@ void NetworkMessage::addBytes(const char* bytes, size_t size)
 
 void NetworkMessage::addPaddingBytes(size_t n)
 {
-	std::cout << "addPaddingBytes:";
-	for(uint32_t i=0; i<n; ++i) {
-		std::cout << "33 ";
-	}
-	std::cout << std::endl;
-
 	if (!canAdd(n)) {
 		return;
 	}
@@ -90,23 +81,46 @@ void NetworkMessage::addPaddingBytes(size_t n)
 
 void NetworkMessage::addPosition(const Position& pos)
 {
-	std::cout << "addPosition: " << std::hex << std::setw(4) << std::setfill('0') << static_cast<uint32_t>(pos.x) << " " << static_cast<uint32_t>(pos.y) << std::setw(2) << " " << static_cast<uint32_t>(pos.z) << std::dec << std::endl;
 	add<uint16_t>(pos.x);
 	add<uint16_t>(pos.y);
 	addByte(pos.z);
 }
 
+namespace {
+
+// any valid 7.72 item, sent instead of items that do not exist in 7.72 (client id 0 makes the client crash)
+constexpr uint16_t FALLBACK_CLIENT_ID = 100;
+
+uint16_t getClientId(uint16_t serverId)
+{
+	const uint16_t clientId = Item::items[serverId].clientId;
+	if (clientId != 0) {
+		return clientId;
+	}
+
+	static std::unordered_set<uint16_t> reported;
+	if (reported.insert(serverId).second) {
+		std::cout << "[Warning - NetworkMessage::addItem] Item " << serverId
+		          << " has no 7.72 client id, sending a placeholder instead." << std::endl;
+	}
+	return FALLBACK_CLIENT_ID;
+}
+
+// 7.72 client only knows 8 fluid colors, server fluid types are built as color + 8 * n
+uint8_t getClientFluidColor(uint8_t fluidType) { return fluidType & 7; }
+
+} // namespace
+
 void NetworkMessage::addItem(uint16_t id, uint8_t count)
 {
 	const ItemType& it = Item::items[id];
 
-	std::cout << "addItem: " << std::hex << std::setw(4) << std::setfill('0') << static_cast<uint32_t>(it.clientId) << std::dec << std::endl;
+	add<uint16_t>(getClientId(id));
 
-	add<uint16_t>(it.clientId);
-
-	if (it.stackable || it.isSplash() || it.isFluidContainer()) {
-		std::cout << "addItem it.stackable true" << std::endl;
+	if (it.stackable) {
 		addByte(count);
+	} else if (it.isSplash() || it.isFluidContainer()) {
+		addByte(getClientFluidColor(count));
 	}
 }
 
@@ -114,27 +128,13 @@ void NetworkMessage::addItem(const Item* item)
 {
 	const ItemType& it = Item::items[item->getID()];
 
-	std::cout << "addItem: " << std::hex << std::setw(4) << std::setfill('0') << static_cast<uint32_t>(it.clientId) << std::dec << std::endl;
+	add<uint16_t>(getClientId(item->getID()));
 
-	add<uint16_t>(it.clientId);
-
-	/*
 	if (it.stackable) {
 		addByte(std::min<uint16_t>(0xFF, item->getItemCount()));
 	} else if (it.isSplash() || it.isFluidContainer()) {
-		addByte(fluidMap[item->getFluidType() & 7]);
-	}*/
-
-	if (it.stackable) {
-		std::cout << "addItem it.stackable true" << std::endl;
-		addByte(std::min<uint16_t>(0xFF, item->getItemCount()));
-	} else if (it.isSplash() || it.isFluidContainer()) {
-		std::cout << "addItem it.isSplash() || it.isFluidContainer() true" << std::endl;
-		addByte(item->getSubType());
+		addByte(getClientFluidColor(item->getFluidType()));
 	}
 }
 
-void NetworkMessage::addItemId(uint16_t itemId) { 
-	std::cout << "addItem: " << std::hex << std::setw(4) << std::setfill('0') << static_cast<uint32_t>(itemId) << std::dec << std::endl;
-	add<uint16_t>(Item::items[itemId].clientId); 
-}
+void NetworkMessage::addItemId(uint16_t itemId) { add<uint16_t>(getClientId(itemId)); }

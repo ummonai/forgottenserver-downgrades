@@ -847,8 +847,9 @@ void Tile::addThing(int32_t, Thing* thing)
 		}
 
 		creature->setParent(this);
+		// 7.72: the newest creature on a tile gets the lowest creature stackpos (descriptions iterate in reverse)
 		CreatureVector* creatures = makeCreatures();
-		creatures->insert(creatures->begin(), creature);
+		creatures->insert(creatures->end(), creature);
 	} else {
 		Item* item = thing->getItem();
 		if (!item) {
@@ -1431,8 +1432,9 @@ void Tile::internalAddThing(uint32_t, Thing* thing)
 			g_game.map.clearPlayersSpectatorCache();
 		}
 
+		// 7.72: the newest creature on a tile gets the lowest creature stackpos (descriptions iterate in reverse)
 		CreatureVector* creatures = makeCreatures();
-		creatures->insert(creatures->begin(), creature);
+		creatures->insert(creatures->end(), creature);
 	} else {
 		Item* item = thing->getItem();
 		if (!item) {

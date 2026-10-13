@@ -7,6 +7,7 @@
 
 #include "bed.h"
 #include "configmanager.h"
+#include "depotchest.h"
 #include "game.h"
 #include "housetile.h"
 #include "inbox.h"
@@ -228,9 +229,11 @@ bool House::transferToDepot(Player* player) const
 		}
 	}
 
+	// 7.72: items go to the depot of the town the house belongs to
+	DepotChest* depotChest = player->getDepotChest(townId, true);
 	for (Item* item : moveItemList) {
-		g_game.internalMoveItem(item->getParent(), player->getInbox(), INDEX_WHEREEVER, item, item->getItemCount(),
-		                        nullptr, FLAG_NOLIMIT);
+		g_game.internalMoveItem(item->getParent(), depotChest, INDEX_WHEREEVER, item, item->getItemCount(), nullptr,
+		                        FLAG_NOLIMIT);
 	}
 	return true;
 }
@@ -689,7 +692,8 @@ void Houses::payHouses(RentPeriod_t rentPeriod) const
 				letter->setText(fmt::format(
 				    "Warning! \nThe {:s} rent of {:d} gold for your house \"{:s}\" is payable. Have it within {:d} days or you will lose this house.",
 				    period, house->getRent(), house->getName(), daysLeft));
-				g_game.internalAddItem(player.getInbox(), letter, INDEX_WHEREEVER, FLAG_NOLIMIT);
+				g_game.internalAddItem(player.getDepotChest(house->getTownId(), true), letter, INDEX_WHEREEVER,
+				                       FLAG_NOLIMIT);
 				house->setPayRentWarnings(house->getPayRentWarnings() + 1);
 			} else {
 				house->setOwner(0, true, &player);

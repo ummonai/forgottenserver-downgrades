@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.19)
 
-cmake_policy(SET CMP0167 OLD)
+if (POLICY CMP0167)
+    cmake_policy(SET CMP0167 OLD)
+endif ()
 
 set(CMAKE_DISABLE_SOURCE_CHANGES ON)
 set(CMAKE_DISABLE_IN_SOURCE_BUILD ON)

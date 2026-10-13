@@ -335,6 +335,8 @@ ReturnValue Actions::internalUseItem(Player* player, const Position& pos, uint8_
 
 		if (bed->trySleep(player)) {
 			player->setBedItem(bed);
+			// 7.72 has no offline training dialog, the player goes to sleep right away
+			bed->sleep(player);
 		}
 
 		return RETURNVALUE_NOERROR;
@@ -345,9 +347,9 @@ ReturnValue Actions::internalUseItem(Player* player, const Position& pos, uint8_
 
 		// depot container
 		if (DepotLocker* depot = container->getDepotLocker()) {
-			DepotLocker& myDepotLocker = player->getDepotLocker();
-			myDepotLocker.setParent(depot->getParent()->getTile());
-			openContainer = &myDepotLocker;
+			DepotLocker* myDepotLocker = player->getDepotLocker(depot->getDepotId());
+			myDepotLocker->setParent(depot->getParent()->getTile());
+			openContainer = myDepotLocker;
 		} else {
 			openContainer = container;
 		}

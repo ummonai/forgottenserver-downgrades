@@ -57,8 +57,10 @@ Player::~Player()
 		}
 	}
 
-	if (depotLocker) {
-		depotLocker->removeInbox(inbox);
+	// lockers hold a reference to their depot chest, release them first
+	depotLockerMap.clear();
+	for (const auto& it : depotChests) {
+		it.second->decrementReferenceCounter();
 	}
 
 	inbox->decrementReferenceCounter();
@@ -806,33 +808,31 @@ DepotChest* Player::getDepotChest(uint32_t depotId, bool autoCreate)
 		return nullptr;
 	}
 
-	uint16_t depotItemId = getDepotBoxId(depotId);
-	if (depotItemId == 0) {
-		return nullptr;
-	}
-
-	it = depotChests.emplace(depotId, new DepotChest(depotItemId)).first;
-	it->second->setMaxDepotItems(getMaxDepotItems());
-	return it->second;
+	// 7.72: one depot chest per town (depotId)
+	DepotChest* depotChest = new DepotChest(ITEM_DEPOT);
+	depotChest->incrementReferenceCounter();
+	depotChest->setMaxDepotItems(getMaxDepotItems());
+	depotChests.emplace(depotId, depotChest);
+	return depotChest;
 }
 
-DepotLocker& Player::getDepotLocker()
+DepotLocker* Player::getDepotLocker(uint32_t depotId)
 {
-	if (!depotLocker) {
-		depotLocker = std::make_shared<DepotLocker>(ITEM_LOCKER);
-		depotLocker->internalAddThing(inbox);
-
-		DepotChest* depotChest = new DepotChest(ITEM_DEPOT, false);
-		// adding in reverse to align them from first to last
-		for (int16_t depotId = depotChest->capacity(); depotId >= 0; --depotId) {
-			if (DepotChest* box = getDepotChest(depotId, true)) {
-				depotChest->internalAddThing(box);
-			}
-		}
-
-		depotLocker->internalAddThing(depotChest);
+	auto it = depotLockerMap.find(depotId);
+	if (it != depotLockerMap.end()) {
+		return it->second.get();
 	}
-	return *depotLocker;
+
+	// 7.72: every town has its own locker holding the depot chest of that town
+	auto depotLocker = std::make_shared<DepotLocker>(ITEM_LOCKER);
+	depotLocker->setDepotId(depotId);
+
+	DepotChest* depotChest = getDepotChest(depotId, true);
+	depotChest->incrementReferenceCounter(); // released by the locker
+	depotLocker->internalAddThing(depotChest);
+
+	depotLockerMap.emplace(depotId, depotLocker);
+	return depotLocker.get();
 }
 
 void Player::sendCancelMessage(ReturnValue message) const { sendCancelMessage(getReturnMessage(message)); }
@@ -3084,13 +3084,14 @@ void Player::postRemoveNotification(Thing* thing, const Cylinder* newParent, int
 			} else if (container->getTopParent() == this) {
 				onSendContainer(container);
 			} else if (const Container* topContainer = dynamic_cast<const Container*>(container->getTopParent())) {
-				if (const DepotChest* depotChest = dynamic_cast<const DepotChest*>(topContainer)) {
+				if (const DepotLocker* depotLocker = dynamic_cast<const DepotLocker*>(topContainer)) {
 					bool isOwner = false;
 
-					for (const auto& it : depotChests) {
-						if (it.second == depotChest) {
+					for (const auto& it : depotLockerMap) {
+						if (it.second.get() == depotLocker) {
 							isOwner = true;
 							onSendContainer(container);
+							break;
 						}
 					}
 
